@@ -1,0 +1,16 @@
+{
+  "name": "torch",
+  "version": "1.0.0",
+  "description": "'web highlights'",
+  "main": "tweets.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "vulcanoahab",
+  "license": "ISC",
+  "dependencies": {
+    "cassandra-driver": "^3.1.5",
+    "string-format": "^0.5.0",
+    "twitter": "^1.4.0"
+  }
+}
