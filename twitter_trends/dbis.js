@@ -27,20 +27,32 @@ function createKeyspace(keyspace_name='twitter_trends') {
                     WITH replication = {'class': 'SimpleStrategy', \
                     'replication_factor': '3' }";
     var query=template.replace('keyspace_name',keyspace_name);
-    client.execute(query function (err, result) {
+    client.execute(query, function (err, result) {
         if (err) {
             client.shutdown();
-            var msg=format('There was while trying to create \
+            var msg=format('Fail while trying to create \
                             keyspace: [{}]. Error:[{}]',  keyspace_name, err);
             return console.error(msg);
         });
 }
 
 function createTrendsTable(table_name='twitter_trends.trends') {
-   /** var template = "CREATE TABLE IF NOT EXISTS {} ";
+   var template = "CREATE TABLE IF NOT EXISTS {} \
+                    (uuid uuid, \
+                    created_at timestamp, \
+                    name text, \
+                    query text, \
+                    url text, \
+                    location text, \
+                    PRIMARY KEY(uuid))";
     var query=format(template, table_name);
-    client.execute(query);
-    **/
+    client.execute(query, function (err, result) {
+        if (err) {
+            client.shutdown();
+            var msg=format('Fail  while trying to create \
+                            table: [{}]. Error:[{}]',  table_name, err);
+            return console.error(msg);
+        });
     }
 
 function createTweetsTable(table_name='twitter_trends.tweets') {
@@ -64,6 +76,56 @@ function createTweetsTable(table_name='twitter_trends.tweets') {
                     lang varchar, \
                     PRIMARY KEY(id))";
     var query=format(template, table_name);
-    client.execute(query);
+    client.execute(query, function (err, result) {
+        if (err) {
+            client.shutdown();
+            var msg=format('Fail  while trying to create \
+                            table: [{}]. Error:[{}]',  table_name, err);
+            return console.error(msg);
+        });
     }
 
+function createUsersTable(table_name='twitter_trends.users') {
+    var template="CREATE TABLE IF NOT EXISTS {} \
+                    (id int, \
+                    created_at timestamp, \
+                    name varchar, \
+                    screen_name varchar, \
+                    profile_image_url text, \
+                    location  text, \
+                    description text, \
+                    url text, \
+                    utc_offset int, \
+                    lang varchar, \
+                    geo_enabled boolean, \
+                    time_zone varchar, \
+                    profile_background_image_url text, \
+                    followers_count int, \
+                    listed_count int, \
+                    favourites_count int, \
+                    statuses_count int, \
+                    friends_count int, \
+                    PRIMARY KEY(id))";
+    var query=format(template, table_name);
+    client.execute(query, function (err, result) {
+        if (err) {
+            client.shutdown();
+            var msg=format('Fail  while trying to create \
+                            table: [{}]. Error:[{}]',  table_name, err);
+            return console.error(msg);
+        });
+    
+    
+    }
+
+function insertTweet(tweetObj, table_name='twitter_trends.tweets'){
+
+}
+
+function insertUser(userObj, table_name='twitter_trends.tweets'){
+
+}
+
+function parseStreamTweet(tweetStreamObj){
+    return {'tweet':tweetObj, 'user'userObj};
+}
