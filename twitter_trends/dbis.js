@@ -68,7 +68,7 @@ function createTweetsTable(table_name='twitter_trends.tweets') {
                     place map, \
                     retweet_count int, \
                     in_reply_to_status_id int, \
-                    txt text, \
+                    text text, \
                     user int, \
                     source varchar, \
                     favorite_count int, \
@@ -126,6 +126,62 @@ function insertUser(userObj, table_name='twitter_trends.tweets'){
 
 }
 
+
+function tweetis (tweet){
+    this.id=tweet.id;
+    this.text=tweet.text;
+    this.description=tweet.description;
+    this.created_at=new Date(Date.parse(tweet.created_at));
+    this.location=tweet.location;
+    this.hashtags=tweet.entities.hashtags.map(function(e){return e.text});
+    this.urls=tweet.entities.urls.map(function(e){return e.expanded_url});
+    this.user_mentions=tweet.entities.user_mentions.map(
+                                            function(e){return e.screen_name});
+    this.in_reply_to_user_id=tweet.in_reply_to_user_id;
+    this.metadata=tweet.metadata;
+    this.in_reply_to_status_id=tweet.in_reply_to_status_id;       
+    this.coordinates=tweet.coordinates;
+    this.user=tweet.user.id;
+    this.place=tweet.place;
+    this.retweet_count=tweet.retweet_count;
+    this.in_reply_to_status_id=tweet.in_reply_to_status_id;
+    this.text=tweet.text;
+    this.source=tweet.source;
+    this.favorite_count=tweet.favorite_count;
+    this.quoted_status_id=tweet.quoted_status_id;
+    this.lang=tweet.lang;
+               
+}
+
+
+function useris (user){
+    this.id=user.id;
+    this.created_at=new Date(Date.parse(user.created_at));
+    this.name=user.name;
+    this.screen_name=user.user_name;
+    this.profile_image_url=user.profile_image_url;
+    this.location=user.location;
+    this.description=user.description;
+    this.url=user.url;
+    this.utc_offset=user.utc_offset;
+    this.lang=user.lang;
+    this.geo_enabled=user.geo_enabled;
+    this.time_zone=user.time_zone;
+    this.profile_background_image_url=user.profile_background_image_url;
+    this.followers_count=user.followers_count;
+    this.listed_count=user.listed_count;
+    this.favourites_count=user.favourites_count;
+    this.statuses_count=user.statuses_count;
+    this.friends_count=user.friends_count;
+}
+
+
 function parseStreamTweet(tweetStreamObj){
+    //create objs
+    var tweetObj= new tweetis(tweetStreamObj);
+    var userObj=new useris(tweetStreamObj.user);
+    //cross fields update
+    userObj.tweet=tweetObj.id
+    //done
     return {'tweet':tweetObj, 'user'userObj};
 }

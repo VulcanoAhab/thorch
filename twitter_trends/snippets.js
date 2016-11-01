@@ -300,7 +300,7 @@ test_promise
     .then(function(terms){console.log('TERMS 2 '+terms)});
 **/
 
-
+/**
 var Twitter = require('twitter');
 var confs = require('./confs.js');
 
@@ -311,6 +311,12 @@ var client=new Twitter(tw_creds);
 var tws=client.get('search/tweets', {q: 'node.js'}, function(error, tweets, response) {
    return tweets;
 });
+**/
 
-console.log(tws)
+function test(k){
+    this.t=k.t;
+    this.d=k.d;
+}
 
+var tis=new test({'t':1,'d':2})
+console.log(tis)
