@@ -316,7 +316,29 @@ var tws=client.get('search/tweets', {q: 'node.js'}, function(error, tweets, resp
 function test(k){
     this.t=k.t;
     this.d=k.d;
+    
 }
 
-var tis=new test({'t':1,'d':2})
-console.log(tis)
+test.prototype.keys=function(){
+    return Object.keys(this).filter(function(k) { 
+        if (k!='keys'){return k}
+    });
+} 
+    
+
+test.prototype.toJson=function(){
+        var keys=this.keys();
+        var json=[];
+        for (i=0;i<keys.length;++i){
+            temp={};
+            var k=keys[i];
+            if (k=='toJson'){continue};
+            var v=this[k];
+            temp[k]=v
+            json.push(temp);
+        }
+        return json
+}
+
+var tis=new test({'t':1,'d':2});
+console.log(tis.toJson());

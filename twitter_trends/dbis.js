@@ -4,7 +4,16 @@ var format = require('string-format');
 
 var _CONN={};
 
-function connect (nodes=['127.0.0.1']){
+function test_input(variable, default_value){
+    if (typeof variable !== 'undefined') {
+        return variable;
+    }
+    return default_value;
+}
+
+function connect (nodes){
+    
+    nodes = test_input(nodes, ['127.0.0.1']);
     
     _CONN.client=new cassandra.Client({ contactPoints: nodes});
     _CONN.client.connect(function (err) {
@@ -22,7 +31,10 @@ function close (){
     client.shutdown();
 }
 
-function createKeyspace(keyspace_name='twitter_trends') {
+function createKeyspace(keyspace_name) {
+    
+    keyspace_name = typeof keyspace_name !== 'undefined' ? keyspace_name : 'twitter_trends';
+
     var tempale =   "CREATE KEYSPACE IF NOT EXISTS keyspace_name \
                     WITH replication = {'class': 'SimpleStrategy', \
                     'replication_factor': '3' }";
@@ -126,6 +138,30 @@ function insertUser(userObj, table_name='twitter_trends.tweets'){
 
 }
 
+function dbObj () {
+
+    this.keys=function(){
+    return Object.keys(this).filter(function(k) { 
+        if (k!='keys'){return k}
+        });
+    } 
+    
+    this.toJson=function(){
+        var keys=this.keys();
+        var json=[];
+        for (i=0;i<keys.length;++i){
+            temp={};
+            var k=keys[i];
+            if (k=='toJson'){continue};
+            var v=this[k];
+            temp[k]=v
+            json.push(temp);
+        }
+        return json
+    }
+
+}
+
 
 function tweetis (tweet){
     this.id=tweet.id;
@@ -149,9 +185,10 @@ function tweetis (tweet){
     this.source=tweet.source;
     this.favorite_count=tweet.favorite_count;
     this.quoted_status_id=tweet.quoted_status_id;
-    this.lang=tweet.lang;
-               
+    this.lang=tweet.lang;               
 }
+
+tweetis.prototype=new dbObj();
 
 
 function useris (user){
@@ -174,6 +211,9 @@ function useris (user){
     this.statuses_count=user.statuses_count;
     this.friends_count=user.friends_count;
 }
+
+useris.prototype=new dbObj();
+
 
 
 function parseStreamTweet(tweetStreamObj){

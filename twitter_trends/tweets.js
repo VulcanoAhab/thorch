@@ -64,6 +64,6 @@ var run_stream = function(terms) {
     });
 }
 
-trends=fetch_trends(woeids)
-console.log(trends)
-//run_stream(terms)
+//trends=fetch_trends(woeids)
+//console.log(trends)
+run_stream(['amor','paixao'])
