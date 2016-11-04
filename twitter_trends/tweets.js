@@ -29,7 +29,7 @@ client.get('trends/available.json', function(error, data) {
 **/
 
 //get trends
-var woeids=['23424768']
+var woeids=['23424768'];
 
 var fetch_trends=function(woeids) {
  
@@ -56,7 +56,8 @@ var run_stream = function(terms) {
     var stream=client.stream('statuses/filter', {track: stream_terms});
 
     stream.on('data', function(event) {
-      console.log(event && event.text);
+        console.log(event && event.text);
+        console.log(Data.parseStreamTweet(event));
     });
      
     stream.on('error', function(error) {

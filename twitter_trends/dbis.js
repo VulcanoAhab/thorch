@@ -1,6 +1,8 @@
 "use strict";
 var cassandra = require('cassandra-driver');
 var format = require('string-format');
+var exports = module.exports;
+
 
 var _CONN={};
 
@@ -235,3 +237,5 @@ function parseStreamTweet(tweetStreamObj){
     //done
     return {'tweet':tweetObj, 'user':userObj};
 }
+
+exports.parseStreamTweet=parseStreamTweet
