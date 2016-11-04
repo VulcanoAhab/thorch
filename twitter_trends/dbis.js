@@ -33,7 +33,7 @@ function close (){
 
 function createKeyspace(keyspace_name) {
     
-    keyspace_name = typeof keyspace_name !== 'undefined' ? keyspace_name : 'twitter_trends';
+    keyspace_name = test_input(keyspace_name, 'twitter_trends');
 
     var tempale =   "CREATE KEYSPACE IF NOT EXISTS keyspace_name \
                     WITH replication = {'class': 'SimpleStrategy', \
@@ -45,11 +45,14 @@ function createKeyspace(keyspace_name) {
             var msg=format('Fail while trying to create \
                             keyspace: [{}]. Error:[{}]',  keyspace_name, err);
             return console.error(msg);
-        });
+            }
+    });
 }
 
-function createTrendsTable(table_name='twitter_trends.trends') {
-   var template = "CREATE TABLE IF NOT EXISTS {} \
+function createTrendsTable(table_name) {
+   
+    table_name = test_input(table_name, 'twitter_trends.trends');
+    var template = "CREATE TABLE IF NOT EXISTS {} \
                     (uuid uuid, \
                     created_at timestamp, \
                     name text, \
@@ -64,10 +67,13 @@ function createTrendsTable(table_name='twitter_trends.trends') {
             var msg=format('Fail  while trying to create \
                             table: [{}]. Error:[{}]',  table_name, err);
             return console.error(msg);
-        });
-    }
+            }
+    });
+}
 
-function createTweetsTable(table_name='twitter_trends.tweets') {
+function createTweetsTable(table_name) {
+
+    table_name = test_input(table_name, 'twitter_trends.tweets');
     var template = "CREATE TABLE IF NOT EXISTS {} \
                     (id int, \
                     created_at timestamp, \
@@ -94,10 +100,13 @@ function createTweetsTable(table_name='twitter_trends.tweets') {
             var msg=format('Fail  while trying to create \
                             table: [{}]. Error:[{}]',  table_name, err);
             return console.error(msg);
-        });
-    }
+            }
+    });
+}
 
-function createUsersTable(table_name='twitter_trends.users') {
+function createUsersTable(table_name) {
+
+    table_name = test_input(table_name, 'twitter_trends.users');
     var template="CREATE TABLE IF NOT EXISTS {} \
                     (id int, \
                     created_at timestamp, \
@@ -125,16 +134,17 @@ function createUsersTable(table_name='twitter_trends.users') {
             var msg=format('Fail  while trying to create \
                             table: [{}]. Error:[{}]',  table_name, err);
             return console.error(msg);
-        });
+            }
+    });
     
     
     }
 
-function insertTweet(tweetObj, table_name='twitter_trends.tweets'){
+function insertTweet(tweetObj){
 
 }
 
-function insertUser(userObj, table_name='twitter_trends.tweets'){
+function insertUser(userObj){
 
 }
 
@@ -223,5 +233,5 @@ function parseStreamTweet(tweetStreamObj){
     //cross fields update
     userObj.tweet=tweetObj.id
     //done
-    return {'tweet':tweetObj, 'user'userObj};
+    return {'tweet':tweetObj, 'user':userObj};
 }
