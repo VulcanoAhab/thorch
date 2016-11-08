@@ -38,7 +38,7 @@ var fetch_trends=function(woeids) {
                    function(error, data, response) {
                      if (error) throw error;
                       //save terms
-                      Data.insert_trends(data[0].trends, woeid)
+                      Data.insert_trends(data[0].trends, woeid);
                       }
                   );
     }
@@ -55,8 +55,8 @@ var run_stream = function(terms) {
     var stream=client.stream('statuses/filter', {track: stream_terms});
 
     stream.on('data', function(tweet) {
-      var streamResponseObj=Data.parseStreamTweet(tweet);
-      streamResponseObj.insert()
+      var response=Data.parseStreamTweet(tweet);
+      response.insert();
     });
 
     stream.on('error', function(error) {
@@ -66,4 +66,4 @@ var run_stream = function(terms) {
 
 //trends=fetch_trends(woeids)
 //console.log(trends)
-run_stream(['amor','paixao'])
+run_stream(['amor','paixao']);

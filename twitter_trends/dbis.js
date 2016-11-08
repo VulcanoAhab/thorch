@@ -39,12 +39,13 @@ function createKeyspace(keyspace_name) {
 
     keyspace_name = test_input(keyspace_name, 'twitter_trends');
 
-    var tempale =   "CREATE KEYSPACE IF NOT EXISTS keyspace_name \
+    var template =   "CREATE KEYSPACE IF NOT EXISTS keyspace_name \
                     WITH replication = {'class': 'SimpleStrategy', \
                     'replication_factor': '3' }";
     var query=template.replace('keyspace_name',keyspace_name);
+
     _CONN.client.execute(query, function (err, result) {
-        if (err) {
+      if (err) {
             _CONN.client.shutdown();
             var msg=format('Fail while trying to create \
                             keyspace: [{}]. Error:[{}]',  keyspace_name, err);
@@ -215,7 +216,8 @@ function useris (user){
 
 useris.prototype=new dbObj();
 
-function streamResponse (tweetObj, userObj ){
+function streamResponse (tweetObj, userObj) {
+
 
   this.tweetObj=tweetObj;
   this.userObj=userObj;
@@ -231,7 +233,7 @@ streamResponse.prototype._insert_obj=function (strObj, type) {
     user:'twitter_trends.users'
   }
   type=test_input(type, 'tweet');
-  var table_name=_tablis[type]
+  var table_name=_tablis[type];
   var query="INSERT INTO ? JSON ?"
   _CONN.client.execute(query, [table_name,strObj], function (err, result) {
       if (err) {
@@ -244,14 +246,24 @@ streamResponse.prototype._insert_obj=function (strObj, type) {
 
 }
 
-streamResponse.prototype.insert=function (tweetObj, userObj) {
+streamResponse.prototype.insert=function () {
   //test connection
-  if (Object.keys(_CONN).indexOf('client') < 0){
+  /**if (Object.keys(_CONN).indexOf('client') < 0){
     connect();
-  }
+  }**/
 
-  this._insert_obj(JSON.stringify(tweetObj.toJson()),'tweet');
-  this._insert_obj(JSON.stringify(userObj.toJson()),'user');
+  var tweetJson=this.tweetObj.toJson();
+  var userJson=this.userObj.toJson();
+
+  console.log(tweetJson);
+  console.log(userJson);
+
+  /**console.log(JSON.stringify(fullJson['tweet']));
+  console.log(JSON.stringify(fullJson['user']));
+  **/
+
+  //this._insert_obj(jsonObj,'tweet');
+  //this._insert_obj(jsonObj,'user');
 }
 
 
@@ -263,10 +275,16 @@ function parseStreamTweet(tweetStreamObj){
     //cross fields update
     userObj.tweet=tweetObj.id
     //done
-    return streamResponse (tweetObj, userObj );
+    var resp=new streamResponse (tweetObj, userObj );
+    return resp;
 }
 
 
-console.log(process.argv.slice(2).length);
+//console.log(process.argv.slice(2).length);
 
-exports.parseStreamTweet=parseStreamTweet
+exports.parseStreamTweet=parseStreamTweet;
+exports.createTweetsTable=createTweetsTable;
+exports.createUsersTable=createUsersTable;
+exports.createKeyspace=createKeyspace;
+exports.connect=connect;
+exports.close=close;
