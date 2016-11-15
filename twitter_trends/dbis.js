@@ -23,16 +23,15 @@ function connect (nodes){
         _CONN.client.shutdown();
         return console.error('[-] There was an error when connecting', err);
         }
-        console.log('[+] Connected to cluster with %d host(s): %j',
-                    _CONN.client.hosts.length, _CONN.client.hosts.keys());
-        console.log('[+] Keyspaces: %j',
-                    Object.keys(_CONN.client.metadata.keyspaces));
+        console.log('[+] Connected');
     });
 }
 
 function close (){
-    console.log('Shutting down');
     _CONN.client.shutdown();
+    console.log('Closing connection');
+    _CONN={};
+
 }
 
 function createKeyspace(keyspace_name) {
@@ -86,9 +85,9 @@ function createTweetsTable(table_name) {
                     urls list <text>, \
                     user_mentions list <text>, \
                     in_reply_to_user_id int, \
-                    metadata map, \
-                    coordinates map, \
-                    place map, \
+                    metadata text, \
+                    coordinates text, \
+                    place text, \
                     retweet_count int, \
                     in_reply_to_status_id int, \
                     text text, \
@@ -166,8 +165,19 @@ function dbObj () {
         return json
     }
 
+    this.toJsonString=function () {
+      return JSON.stringify(this.toJson());
+
+    }
+
 }
 
+function _toStringis(obj){
+  if (typeof obj == undefined || obj == null){
+    return null
+  }
+  return JSON.stringify(obj);
+}
 
 function tweetis (tweet){
     this.id=tweet.id;
@@ -179,9 +189,9 @@ function tweetis (tweet){
                                             function(e){return e.screen_name});
     this.in_reply_to_user_id=tweet.in_reply_to_user_id;
     this.in_reply_to_status_id=tweet.in_reply_to_status_id;
-    this.coordinates=tweet.coordinates;
+    this.coordinates=_toStringis(tweet.coordinates);
     this.user=tweet.user.id;
-    this.place=tweet.place;
+    this.place=_toStringis(tweet.place);
     this.retweet_count=tweet.retweet_count;
     this.in_reply_to_status_id=tweet.in_reply_to_status_id;
     this.source=tweet.source;
@@ -217,14 +227,8 @@ function useris (user){
 useris.prototype=new dbObj();
 
 function streamResponse (tweetObj, userObj) {
-
-
   this.tweetObj=tweetObj;
   this.userObj=userObj;
-
-
-
-
 }
 
 streamResponse.prototype._insert_obj=function (strObj, type) {
@@ -234,8 +238,8 @@ streamResponse.prototype._insert_obj=function (strObj, type) {
   }
   type=test_input(type, 'tweet');
   var table_name=_tablis[type];
-  var query="INSERT INTO ? JSON ?"
-  _CONN.client.execute(query, [table_name,strObj], function (err, result) {
+  var query=format("INSERT INTO {} JSON '{}'", table_name,strObj);
+  _CONN.client.execute(query, function (err, result) {
       if (err) {
           _CONN.client.shutdown();
           var msg=format('Fail  while trying to insert \
@@ -243,27 +247,25 @@ streamResponse.prototype._insert_obj=function (strObj, type) {
           return console.error(msg);
           }
   });
-
 }
 
 streamResponse.prototype.insert=function () {
   //test connection
-  /**if (Object.keys(_CONN).indexOf('client') < 0){
+  console.log('CONNNNNN',_CONN)
+  if (Object.keys(_CONN).indexOf('client') < 0 || ! _CONN.client.connected){
     connect();
-  }**/
+  }
 
-  var tweetJson=this.tweetObj.toJson();
-  var userJson=this.userObj.toJson();
+  var tweetJsonString=this.tweetObj.toJsonString();
+  var userJsonString=this.userObj.toJsonString();
 
-  console.log(tweetJson);
-  console.log(userJson);
 
-  /**console.log(JSON.stringify(fullJson['tweet']));
-  console.log(JSON.stringify(fullJson['user']));
-  **/
+  this._insert_obj(tweetJsonString,'tweet');
+  this._insert_obj(userJsonString,'user');
 
-  //this._insert_obj(jsonObj,'tweet');
-  //this._insert_obj(jsonObj,'user');
+  console.log('[+] INSERTED TWEET ::', this.tweetObj.text);
+  console.log('[+] INSERTED USER ::', this.userObj.screen_name);
+
 }
 
 
@@ -275,10 +277,17 @@ function parseStreamTweet(tweetStreamObj){
     //cross fields update
     userObj.tweet=tweetObj.id
     //done
-    var resp=new streamResponse (tweetObj, userObj );
-    return resp;
+    return new streamResponse (tweetObj, userObj);
+
 }
 
+function showTrendsTables(){
+  var query="select table_name from system_schema.tables \
+             where keyspace_name='twitter_trends';"
+  _CONN.client.execute(query, function(error, result){
+    console.log(result)
+  });
+}
 
 //console.log(process.argv.slice(2).length);
 
@@ -286,5 +295,7 @@ exports.parseStreamTweet=parseStreamTweet;
 exports.createTweetsTable=createTweetsTable;
 exports.createUsersTable=createUsersTable;
 exports.createKeyspace=createKeyspace;
+exports.createTrendsTable=createTrendsTable;
+exports.showTrendsTables=showTrendsTables;
 exports.connect=connect;
 exports.close=close;
