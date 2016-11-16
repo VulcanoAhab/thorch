@@ -79,22 +79,22 @@ function createTweetsTable(table_name) {
 
     table_name = test_input(table_name, 'twitter_trends.tweets');
     var template = "CREATE TABLE IF NOT EXISTS {} \
-                    (id int, \
+                    (id bigint, \
                     created_at timestamp, \
                     hashtags list <text>, \
                     urls list <text>, \
                     user_mentions list <text>, \
-                    in_reply_to_user_id int, \
+                    in_reply_to_user_id bigint, \
                     metadata text, \
                     coordinates text, \
                     place text, \
                     retweet_count int, \
-                    in_reply_to_status_id int, \
+                    in_reply_to_status_id bigint, \
                     text text, \
-                    user int, \
+                    user bigint, \
                     source varchar, \
-                    favorite_count int, \
-                    quoted_status_id int, \
+                    favorite_count bigint, \
+                    quoted_status_id bigint, \
                     lang varchar, \
                     PRIMARY KEY(id))";
     var query=format(template, table_name);
@@ -112,7 +112,7 @@ function createUsersTable(table_name) {
 
     table_name = test_input(table_name, 'twitter_trends.users');
     var template="CREATE TABLE IF NOT EXISTS {} \
-                    (id int, \
+                    (id bigint, \
                     created_at timestamp, \
                     name varchar, \
                     screen_name varchar, \
@@ -125,11 +125,11 @@ function createUsersTable(table_name) {
                     geo_enabled boolean, \
                     time_zone varchar, \
                     profile_background_image_url text, \
-                    followers_count int, \
-                    listed_count int, \
-                    favourites_count int, \
-                    statuses_count int, \
-                    friends_count int, \
+                    followers_count bigint, \
+                    listed_count bigint, \
+                    favourites_count bigint, \
+                    statuses_count bigint, \
+                    friends_count bigint, \
                     PRIMARY KEY(id))";
     var query=format(template, table_name);
     _CONN.client.execute(query, function (err, result) {
@@ -181,7 +181,7 @@ function _toStringis(obj){
 
 function tweetis (tweet){
     this.id=tweet.id;
-    this.text=tweet.text;
+    this.text=tweet.text.replace("'", "");
     this.created_at=new Date(Date.parse(tweet.created_at));
     this.hashtags=tweet.entities.hashtags.map(function(e){return e.text});
     this.urls=tweet.entities.urls.map(function(e){return e.expanded_url});
@@ -251,14 +251,16 @@ streamResponse.prototype._insert_obj=function (strObj, type) {
 
 streamResponse.prototype.insert=function () {
   //test connection
-  console.log('CONNNNNN',_CONN)
   if (Object.keys(_CONN).indexOf('client') < 0 || ! _CONN.client.connected){
     connect();
+    console.log('[++] NEW CON',_CONN);
+
   }
 
   var tweetJsonString=this.tweetObj.toJsonString();
   var userJsonString=this.userObj.toJsonString();
 
+  console.log(userJsonString);
 
   this._insert_obj(tweetJsonString,'tweet');
   this._insert_obj(userJsonString,'user');
@@ -275,7 +277,7 @@ function parseStreamTweet(tweetStreamObj){
     var tweetObj= new tweetis(tweetStreamObj);
     var userObj=new useris(tweetStreamObj.user);
     //cross fields update
-    userObj.tweet=tweetObj.id
+    //userObj.tweet=tweetObj.id
     //done
     return new streamResponse (tweetObj, userObj);
 
