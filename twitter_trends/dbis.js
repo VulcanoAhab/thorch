@@ -15,7 +15,7 @@ function test_input(variable, default_value){
 
 function connect (nodes){
 
-    nodes = test_input(nodes, ['127.0.0.1']);
+    nodes = test_input(nodes, ['192.168.99.101']);
 
     _CONN.client=new cassandra.Client({ contactPoints: nodes});
     _CONN.client.connect(function (err) {
@@ -40,7 +40,7 @@ function createKeyspace(keyspace_name) {
 
     var template =   "CREATE KEYSPACE IF NOT EXISTS keyspace_name \
                     WITH replication = {'class': 'SimpleStrategy', \
-                    'replication_factor': '3' }";
+                    'replication_factor': '1' }";
     var query=template.replace('keyspace_name',keyspace_name);
 
     _CONN.client.execute(query, function (err, result) {
@@ -181,12 +181,23 @@ function _toStringis(obj){
 
 function tweetis (tweet){
     this.id=tweet.id;
-    this.text=tweet.text.replace("'", "");
+    if (tweet.text != undefined) {
+      this.text=tweet.text.replace("'", "");
+                        }
     this.created_at=new Date(Date.parse(tweet.created_at));
-    this.hashtags=tweet.entities.hashtags.map(function(e){return e.text});
-    this.urls=tweet.entities.urls.map(function(e){return e.expanded_url});
-    this.user_mentions=tweet.entities.user_mentions.map(
+    if (tweet.entities != undefined){
+      var enkeys=Object.keys(tweet.entities);
+      if (enkeys.indexOf('hashtags') > -1) {
+        this.hashtags=tweet.entities.hashtags.map(function(e){return e.text});
+      }
+      if (enkeys.indexOf('urls') > -1) {
+        this.urls=tweet.entities.urls.map(function(e){return e.expanded_url});
+      }
+      if (enkeys.indexOf('user_mentions') > -1) {
+        this.user_mentions=tweet.entities.user_mentions.map(
                                             function(e){return e.screen_name});
+      }
+    }
     this.in_reply_to_user_id=tweet.in_reply_to_user_id;
     this.in_reply_to_status_id=tweet.in_reply_to_status_id;
     this.coordinates=_toStringis(tweet.coordinates);

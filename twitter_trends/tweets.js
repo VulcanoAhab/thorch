@@ -56,7 +56,9 @@ var run_stream = function(terms) {
 
     stream.on('data', function(tweet) {
       var response=Data.parseStreamTweet(tweet);
-      response.insert();
+      if (response != undefined) {
+        response.insert();
+      }
     });
 
     stream.on('error', function(error) {
@@ -66,4 +68,4 @@ var run_stream = function(terms) {
 
 //trends=fetch_trends(woeids)
 //console.log(trends)
-run_stream(['amor','paixao']);
+run_stream(['thanks','obrigado']);
