@@ -11,18 +11,17 @@ var tSearch = function() {
 
   this.client={};
   this.maxResults=50;
-  this.count_calls=0
+  this.maxPages=0;
+  this.countPages=0;
 
   this.pagination=function(search_term, result){
-
-    this.count_calls+=1
-
-    if (this.count_calls<3){
-      console.log('+++++++++++++++++++ ENDIS', this.count_calls);
-      result.nextPageToken=0;
-      return
+    if (this.maxPages){
+      this.countPages+=1
+      if (this.countPages>=this.maxPages){
+        result.nextPageToken=0;
+        return 'done'
+      }
     }
-
     if (result.nextPageToken) {
       var pagetoken=result.nextPageToken;
       this.client.addParam('pageToken', pagetoken);
@@ -40,14 +39,13 @@ var tSearch = function() {
       resp.metadata.search_created_at=datis;
       resp.metadata.search_term=search_term;
 
-      console.log(result);
       resp.parse(result);
+      console.log(resp._data);
       //resp.insert();
-
-      setTimeout(that.pagination, 10, search_term, result);
+      setTimeout(function(){}, 10);
+      that.pagination(search_term, result);
     });
   }
-
 
 }
 

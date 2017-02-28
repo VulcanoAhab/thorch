@@ -1,16 +1,15 @@
 var exports=module.exports;
-
+var data=require('./persistance.js');
 
 var response=function() {
   this.metadata={};
   this._data=[];
 
-  this.parse=function(raw_obj){
-    var resps=JSON.parse(raw_obj);
+  this.parse=function(resps){
     var items=resps.items;
-    for (i=0; items.length; i++){
+    for (i=0; i<items.length; i++){
 
-      resp=items[i];
+      var resp=items[i];
 
       var parsed_resp={
         item_id:resp.id.videoId,
@@ -26,6 +25,11 @@ var response=function() {
 
       }
   }
+
+  this.insert=function(db_type){
+    var dbees=data.DBS[db_type];
+  }
+
 }
 
 exports.response=response
