@@ -11,7 +11,7 @@ var tSearch = function() {
 
   this.client={};
   this.maxResults=50;
-  this.maxPages=0;
+  this.maxPages=50;
   this.countPages=0;
 
   this.pagination=function(search_term, result){
@@ -40,8 +40,7 @@ var tSearch = function() {
       resp.metadata.search_term=search_term;
 
       resp.parse(result);
-      console.log(resp._data);
-      //resp.insert();
+      resp.insert(configs.PERSISTENCE);
       setTimeout(function(){}, 10);
       that.pagination(search_term, result);
     });

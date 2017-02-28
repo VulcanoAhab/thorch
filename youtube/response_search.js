@@ -1,5 +1,9 @@
 var exports=module.exports;
+
 var data=require('./persistance.js');
+var torch= require('../torch/dbUtils.js');
+
+var esUtils=torch.esUtils;
 
 var response=function() {
   this.metadata={};
@@ -16,9 +20,14 @@ var response=function() {
         item_kind:resp.id.kind,
         created_at:resp.snippet.publishedAt,
         description:resp.snippet.description,
+        description_cloud:esUtils.textToWordsList(resp.snippet.description),
         title:resp.snippet.title,
+        title_cloud:esUtils.textToWordsList(resp.snippet.title),
         channel_title:resp.snippet.channelTitle,
         channel_id:resp.snippet.channelId,
+        search_term:this.metadata.search_term,
+        search_created_at:this.metadata.search_created_at
+
         }
 
       this._data.push(parsed_resp);
@@ -28,6 +37,11 @@ var response=function() {
 
   this.insert=function(db_type){
     var dbees=data.DBS[db_type];
+    for (i=0;i<this._data.length; i++){
+      var doc=this._data[i];
+      console.log('(•) INSERTING DOC', doc)
+      dbees.insert_doc(doc);
+    }
   }
 
 }

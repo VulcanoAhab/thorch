@@ -2,6 +2,10 @@ var exports = module.exports;
 
 
 var elasticsearch = require('elasticsearch');
+var torch= require('../torch/dbUtils.js');
+
+
+var esUtils=torch.esUtils;
 
 var client = new elasticsearch.Client({
   host: 'localhost:9200',
@@ -42,4 +46,4 @@ var YouES = {
 
 
 //api
-exports.DBS={"elasticsearch":YouES, "cassandra":none};
+exports.DBS={"elasticsearch":YouES, "cassandra":undefined};
