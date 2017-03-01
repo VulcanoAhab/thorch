@@ -23,75 +23,89 @@ var TwCassandra = function () {
     });
   }
 
-this.close=function (){this.client.shutdown;}
+  this.close=function (){
+    this.client.shutdown();
+    this.client=undefined;
+  }
 
+  this.createKeyspace=function(keyspace_name){
+    keyspace_name = helpers.test_input(keyspace_name, 'twitter_trends');
 
-}
+    var template =  "CREATE KEYSPACE IF NOT EXISTS keyspace_name \
+                  WITH replication = {'class': 'SimpleStrategy', \
+                  'replication_factor': '1' }";
 
-
-var _CONN={};
-
-function connect (nodes){
-
-    nodes = test_input(nodes, ['192.168.99.101']);
-
-    _CONN.client=new cassandra.Client({ contactPoints: nodes});
-    _CONN.client.connect(function (err) {
-        if (err) {
-        _CONN.client.shutdown();
-        return console.error('[-] There was an error when connecting', err);
-        }
-        console.log('[+] Connected');
-    });
-}
-
-function close (){
-    _CONN.client.shutdown();
-    console.log('Closing connection');
-    _CONN={};
-
-}
-
-function createKeyspace(keyspace_name) {
-
-    keyspace_name = test_input(keyspace_name, 'twitter_trends');
-
-    var template =   "CREATE KEYSPACE IF NOT EXISTS keyspace_name \
-                    WITH replication = {'class': 'SimpleStrategy', \
-                    'replication_factor': '1' }";
     var query=template.replace('keyspace_name',keyspace_name);
 
-    _CONN.client.execute(query, function (err, result) {
+    this.client.execute(query, function (err, result) {
       if (err) {
-            _CONN.client.shutdown();
-            var msg=format('Fail while trying to create \
-                            keyspace: [{}]. Error:[{}]',  keyspace_name, err);
-            return console.error(msg);
-            }
+          this.client.shutdown();
+          var msg=format('Fail while trying to create \
+                          keyspace: [{}]. Error:[{}]',  keyspace_name, err);
+          return console.error(msg);
+          }
     });
-}
+  }
 
-function createTrendsTable(table_name) {
-
-    table_name = test_input(table_name, 'twitter_trends.trends');
+  this.createTrendsTable=function(table_name) {
+    table_name = helpers.test_input(table_name, 'twitter_trends.trends');
     var template = "CREATE TABLE IF NOT EXISTS {} \
-                    (uuid uuid, \
-                    created_at timestamp, \
-                    name text, \
-                    query text, \
-                    url text, \
-                    location text, \
-                    PRIMARY KEY(uuid))";
+                      (uuid uuid, \
+                      created_at timestamp, \
+                      name text, \
+                      query text, \
+                      url text, \
+                      location text, \
+                      PRIMARY KEY(uuid))";
     var query=format(template, table_name);
-    _CONN.client.execute(query, function (err, result) {
-        if (err) {
-            _CONN.client.shutdown();
+    this.client.execute(query, function (err, result) {
+      if (err) {
+            this.client.shutdown();
             var msg=format('Fail  while trying to create \
-                            table: [{}]. Error:[{}]',  table_name, err);
+                              table: [{}]. Error:[{}]',  table_name, err);
             return console.error(msg);
             }
-    });
+      });
+  }
+
+  this.createTweetsTable(table_name) {
+      table_name = helpers.test_input(table_name, 'twitter_trends.tweets');
+      var template = "CREATE TABLE IF NOT EXISTS {} \
+                      (id bigint, \
+                      created_at timestamp, \
+                      hashtags list <text>, \
+                      urls list <text>, \
+                      user_mentions list <text>, \
+                      in_reply_to_user_id bigint, \
+                      metadata text, \
+                      coordinates text, \
+                      place text, \
+                      retweet_count int, \
+                      in_reply_to_status_id bigint, \
+                      text text, \
+                      user bigint, \
+                      source varchar, \
+                      favorite_count bigint, \
+                      quoted_status_id bigint, \
+                      lang varchar, \
+                      PRIMARY KEY(id))";
+      var query=format(template, table_name);
+      this.client.execute(query, function (err, result) {
+        if (err) {
+          this.client.shutdown();
+          var msg=format('Fail  while trying to create \
+                              table: [{}]. Error:[{}]',  table_name, err);
+          return console.error(msg);
+          }
+      });
+  }
+
+
+
 }
+
+
+
 
 function createTweetsTable(table_name) {
 
