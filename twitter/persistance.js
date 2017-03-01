@@ -1,17 +1,35 @@
 "use strict";
+
+var exports = module.exports;
+
 var cassandra = require('cassandra-driver');
 var format = require('string-format');
-var exports = module.exports;
+var configs=require('./configs.json')
+var helpers=require('./torch/helpers.js')
+
+var TwCassandra = function () {
+  this.client=undefined
+
+
+  this.build_client=function(nodes){
+    var nodes = helpers.test_input(nodes, ['192.168.99.101']);
+    this.client=new cassandra.Client({ contactPoints: nodes});
+    this.client.connect(function (err) {
+        if (err) {
+        this.client.shutdown();
+        return console.error('[-] There was an error when connecting', err);
+        }
+        console.log('[+] Connected');
+    });
+  }
+
+this.close=function (){this.client.shutdown;}
+
+
+}
 
 
 var _CONN={};
-
-function test_input(variable, default_value){
-    if (typeof variable !== 'undefined') {
-        return variable;
-    }
-    return default_value;
-}
 
 function connect (nodes){
 
