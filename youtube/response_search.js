@@ -1,4 +1,3 @@
-var exports=module.exports;
 
 var data=require('./persistance.js');
 var torch= require('../torch/dbUtils.js');
@@ -27,7 +26,6 @@ var response=function() {
         channel_id:resp.snippet.channelId,
         search_term:this.metadata.search_term,
         search_created_at:this.metadata.search_created_at
-
         }
 
       this._data.push(parsed_resp);
@@ -39,11 +37,12 @@ var response=function() {
     var dbees=data.DBS[db_type];
     for (i=0;i<this._data.length; i++){
       var doc=this._data[i];
-      console.log('(•) INSERTING DOC', doc)
       dbees.insert_doc(doc);
+      //console.log('(•) INSERTED DOC', doc)
+
     }
   }
 
 }
 
-exports.response=response
+module.exports=response

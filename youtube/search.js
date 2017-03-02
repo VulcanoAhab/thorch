@@ -1,4 +1,3 @@
-var exports=module.exports
 
 
 var Youtube=require('youtube-node');
@@ -11,11 +10,13 @@ var tSearch = function() {
 
   this.client={};
   this.maxResults=50;
-  this.maxPages=50;
+  this.maxPages=1000;
   this.countPages=0;
+  this._total=0;
 
   this.pagination=function(search_term, result){
-    if (this.maxPages){
+    that=this;
+    if (this.maxPages > 0){
       this.countPages+=1
       if (this.countPages>=this.maxPages){
         result.nextPageToken=0;
@@ -25,23 +26,23 @@ var tSearch = function() {
     if (result.nextPageToken) {
       var pagetoken=result.nextPageToken;
       this.client.addParam('pageToken', pagetoken);
-      this.search(search_term);
+      setTimeout(this.search.bind(that),  1000, search_term, this);
+      //this.search(search_term);
     }
   }
 
   this.search=function(search_term){
     that=this;
-    this.client.search(search_term,
-      this.maxResults, function(error, result){
-      var resp=new tubeResponse.response();
+    this.client.search(search_term, this.maxResults, function(error, result) {
+      var resp=new tubeResponse();
       //search metadata
       var datis=new Date(new Date().getTime()).toString();
       resp.metadata.search_created_at=datis;
       resp.metadata.search_term=search_term;
-
       resp.parse(result);
+      that._total+=resp._data.length;
       resp.insert(configs.PERSISTENCE);
-      setTimeout(function(){}, 10);
+      console.log("(•) Youtube Search total: "+that._total+". Page: "+that.countPages);
       that.pagination(search_term, result);
     });
   }
@@ -55,4 +56,4 @@ tSearch.prototype.build_client=function(){
 }
 
 
-exports.tSearch=tSearch
+module.exports=tSearch

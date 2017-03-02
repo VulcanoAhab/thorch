@@ -106,5 +106,5 @@ var objUtils=function(){
 
 }
 
-
 exports.esUtils=esUtils;
+exports.objUtils=objUtils;
