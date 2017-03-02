@@ -40,10 +40,12 @@ var tSearch = function() {
       resp.metadata.search_created_at=datis;
       resp.metadata.search_term=search_term;
       resp.parse(result);
-      that._total+=resp._data.length;
-      resp.insert(configs.PERSISTENCE);
+      if (resp._data.length>0){
+        that._total+=resp._data.length;
+        resp.insert(configs.PERSISTENCE);
+        that.pagination(search_term, result);
+        }
       console.log("(•) Youtube Search total: "+that._total+". Page: "+that.countPages);
-      that.pagination(search_term, result);
     });
   }
 
