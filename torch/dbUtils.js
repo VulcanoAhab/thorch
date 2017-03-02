@@ -68,4 +68,43 @@ var esUtils = {
 
 }
 
+var objUtils=function(){
+
+  this.dbObj = function () {
+
+      this.keys=function(){
+      return Object.keys(this).filter(function(k) {
+          if (k!='keys'){return k}
+          });
+      }
+
+      this.toJson=function(){
+          var keys=this.keys();
+          var json={};
+          for (var i=0;i<keys.length;++i){
+              var k=keys[i];
+              if (k=='toJson'){continue};
+              var v=this[k];
+              json[k]=v;
+          }
+          return json
+      }
+
+      this.toJsonString=function () {
+        return JSON.stringify(this.toJson());
+
+      }
+  }
+
+  this._toStringis=function(obj){
+    if (typeof obj == undefined || obj == null){
+      return null
+    }
+    return JSON.stringify(obj);
+  }
+
+
+}
+
+
 exports.esUtils=esUtils;
