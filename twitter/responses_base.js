@@ -1,26 +1,57 @@
 var exports = module.exports;
 
-var obis=require('../torch/dbUtils.js')
-var objUtils=obis.objUtils
+var obis=require("../torch/dbUtils.js")
+var mapis=require("../torch/responseUtils.js")
+var objUtils=obis.objUtils;
+
+//prepare parsers Base
+var TrendBase=new mapis.Mapper();
+TrendBase.setFields(['name', 'url', 'promoted_content',
+                     'tweet_volume', 'date', 'date_type']);
+
+function Trend (trend, date, locations) {
+  if (!trend){
+    console.log('[-] Fail: empty trend object');
+    return}
+  if (!local) {
+    console.log('[-] Fail: no local no trend parsing');
+    return}
+  //check date
+  if (!date){
+    var now = new Date();
+    date=now.toISOString();
+    var date_type='from_parser';
+  } else {
+    date=new Date(date).toISOString();
+    var date_type='from_object';
+  }
+  //add dates
+  trend['date']=date;
+  trend['date_type']=date_type;
+  trend['locations']=locations.map(function(e){return e.name});
+  //process
+  return TrendBase.process(trend)
+}
+
 
 
 function Tweet (tweet) {
     this.id=tweet.id;
 
     if (tweet.text != undefined) {
-      this.text=tweet.text.replace("'", "");
+      this.text=tweet.text.replace(" ", "");
                         }
     this.created_at=new Date(Date.parse(tweet.created_at));
 
     if (tweet.entities != undefined){
       var enkeys=Object.keys(tweet.entities);
-      if (enkeys.indexOf('hashtags') > -1) {
+      if (enkeys.indexOf("hashtags") > -1) {
         this.hashtags=tweet.entities.hashtags.map(function(e){return e.text});
       }
-      if (enkeys.indexOf('urls') > -1) {
+      if (enkeys.indexOf("urls") > -1) {
         this.urls=tweet.entities.urls.map(function(e){return e.expanded_url});
       }
-      if (enkeys.indexOf('user_mentions') > -1) {
+      if (enkeys.indexOf("user_mentions") > -1) {
         this.user_mentions=tweet.entities.user_mentions.map(
                                             function(e){return e.screen_name});
       }
@@ -39,7 +70,7 @@ function Tweet (tweet) {
     this.lang=tweet.lang;
 }
 
-tweetis.prototype=new objUtils.dbObj();
+//tweetis.prototype=new objUtils.dbObj();
 
 
 
@@ -64,8 +95,12 @@ function User (user){
     this.friends_count=user.friends_count;
 }
 
-useris.prototype=new objUtils.dbObj();
+//useris.prototype=new objUtils.dbObj();
+
+
+
 
 
 
 exports.Tweet=Tweet
+exports.Trend=Trend;

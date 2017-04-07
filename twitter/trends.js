@@ -1,7 +1,7 @@
 
 var Twitter = require('twitter');
 var confs = require('./configs.js');
-var Trends=require('./response_trends.js')
+var Reponse=require('./response_trends.js')
 
 
 
@@ -36,4 +36,4 @@ function Trends () {
 }
 
 
-module.exports=Trends;
+module.exports.Trends=Trends;
