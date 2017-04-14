@@ -1,4 +1,8 @@
-var trendis=require("../torch/responses_base.js");
+var exports = module.exports;
+
+var trendis=require("./responses_base.js");
+var trendParser=trendis.Trends;
+
 
 var response=function(){
 
@@ -12,7 +16,7 @@ var response=function(){
       var trends=raw_obj.trends;
       for (var i=0; i<trends.length; ++i){
           var trend=trends[i];
-          var finTrend=trendis.process(trend, date, locations);
+          var finTrend=trendParser(trend, date, locations);
           console.log(finTrend);
       }
     }
@@ -21,5 +25,5 @@ var response=function(){
 }
 
 
-module.exports=response
-module._testObject=require('trends_sample')
+exports.response=response
+exports._testObject=require("./trends_sample.json")

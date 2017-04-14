@@ -4,7 +4,7 @@ var obis=require("../torch/dbUtils.js")
 var mapis=require("../torch/responseUtils.js")
 var objUtils=obis.objUtils;
 
-//prepare parsers Base
+//prepare trend base
 var TrendBase=new mapis.Mapper();
 TrendBase.setFields(['name', 'url', 'promoted_content',
                      'tweet_volume', 'date', 'date_type']);
