@@ -9,7 +9,7 @@ var response=function(){
   this._data=[];
 
   this.parse=function(responseArray){
-    for (k=0; k<responseArray.length; ++i){
+    for (k=0; k<responseArray.length; ++k){
       var raw_obj=responseArray[k];
       var date=raw_obj.created_at;
       var locations=raw_obj.locations;
