@@ -1,7 +1,7 @@
 var exports = module.exports;
 
 var trendis=require("./responses_base.js");
-var trendParser=trendis.Trends;
+var trendParser=trendis.Trend;
 
 
 var response=function(){

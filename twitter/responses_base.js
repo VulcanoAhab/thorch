@@ -13,7 +13,7 @@ function Trend (trend, date, locations) {
   if (!trend){
     console.log('[-] Fail: empty trend object');
     return}
-  if (!local) {
+  if (!locations) {
     console.log('[-] Fail: no local no trend parsing');
     return}
   //check date
