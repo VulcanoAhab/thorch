@@ -17,7 +17,7 @@ var response=function(){
       for (var i=0; i<trends.length; ++i){
           var trend=trends[i];
           var finTrend=trendParser(trend, date, locations);
-          console.log(finTrend);
+          this._data.push(finTrend);
       }
     }
   }

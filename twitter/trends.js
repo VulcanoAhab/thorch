@@ -28,7 +28,9 @@ function Trends () {
                           function(error, data, response) {
                   if (error) throw error;
                   //build response
-                  console.log(data[0].trends);
+                  var resp=new Reponse.response();
+                  resp.parse(data);
+                  console.log(resp._data);
                 })
         }
     })
